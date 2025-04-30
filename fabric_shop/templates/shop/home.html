@@ -1,0 +1,88 @@
+{% extends "shop/base.html" %}
+
+{% block title %}Головна - Магазин тканин та фурнітури{% endblock %}
+
+{% block slider %}
+<div id="myCarousel" class="carousel slide" data-bs-ride="carousel">
+  <!-- Indicators -->
+  <ol class="carousel-indicators">
+    {% for slide in slides %}
+      <li data-bs-target="#myCarousel" data-bs-slide-to="{{ forloop.counter0 }}" {% if forloop.first %}class="active"{% endif %}></li>
+    {% endfor %}
+  </ol>
+
+  <!-- Slides -->
+  <div class="carousel-inner">
+    {% for slide in slides %}
+      <div class="carousel-item {% if forloop.first %}active{% endif %}">
+        <img src="{{ slide.image.url }}" alt="{{ slide.title }}" class="d-block w-100" style="max-height: 400px; object-fit: cover;">
+        <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded">
+          <h3>{{ slide.title }}</h3>
+          <p>{{ slide.description }}</p>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+  <!-- Controls -->
+  <button class="carousel-control-prev" type="button" data-bs-target="#myCarousel" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Попередній</span>
+  </button>
+  <button class="carousel-control-next" type="button" data-bs-target="#myCarousel" data-bs-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Наступний</span>
+  </button>
+</div>
+{% endblock %}
+
+{% block content %}
+<section class="py-5">
+  <div class="container px-4 px-lg-5">
+    <h2 class="text-center mb-4">Наші категорії</h2>
+    <div class="row gx-4 gx-lg-5">
+
+    {% for category in categories %}
+    <div class="col-md-4 mb-5">
+      <div class="card h-100 text-center">
+        <img class="card-img-top" src="{{ category.image.url }}" alt="{{ category.name }}">
+        <div class="card-body">
+            <h5 class="card-title">{{ category.name }}</h5>
+            <p class="card-text">{{ category.description }}</p>
+        </div>
+        <div class="card-footer bg-transparent">
+            <a class="btn btn-outline-dark" href="#">Переглянути</a>
+        </div>
+      </div>
+    </div>
+{% endfor %}
+
+    </div>
+  </div>
+</section>
+
+<section class="py-5 bg-light">
+  <div class="container px-4 px-lg-5">
+    <div class="text-center">
+      <h2 class="mb-4">Чому обирають нас?</h2>
+    </div>
+    <div class="row gx-4 gx-lg-5">
+      <div class="col-md-4 text-center mb-4">
+        <div class="mb-2"><i class="bi bi-truck fs-1"></i></div>
+        <h5>Швидка доставка</h5>
+        <p>Ми швидко доставляємо замовлення по всій Україні.</p>
+      </div>
+      <div class="col-md-4 text-center mb-4">
+        <div class="mb-2"><i class="bi bi-star-fill fs-1"></i></div>
+        <h5>Висока якість</h5>
+        <p>Пропонуємо тільки найкращі тканини та матеріали.</p>
+      </div>
+      <div class="col-md-4 text-center mb-4">
+        <div class="mb-2"><i class="bi bi-telephone-fill fs-1"></i></div>
+        <h5>Підтримка клієнтів</h5>
+        <p>Завжди готові допомогти вам з вибором та консультацією.</p>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
