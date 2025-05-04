@@ -81,8 +81,6 @@ class Product(models.Model):
                 errors['color'] = 'Не потрібно вказувати колір, якщо є варіанти.'
             if self.size:
                 errors['size'] = 'Не потрібно вказувати розмір, якщо є варіанти.'
-            if self.unit_of_measurement:
-                errors['unit_of_measurement'] = 'Не потрібно вказувати одиницю, якщо є варіанти.'
             if errors:
                 raise ValidationError(errors)
 
@@ -95,7 +93,6 @@ class ProductVariant(models.Model):
     quantity = models.PositiveIntegerField(default=0, verbose_name="Кількість на складі")
     price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Ціна", null=True, blank=True)
     image = models.ImageField(upload_to='product_variants/', blank=True, null=True, verbose_name="Картинка")
-    unit_of_measurement = models.ForeignKey('UnitOfMeasurement', on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Одиниця вимірювання")
 
     class Meta:
         verbose_name = "Варіант товару"
@@ -104,6 +101,10 @@ class ProductVariant(models.Model):
 
     def __str__(self):
         return f"{self.product.name} - {self.color or 'Без кольору'}, {self.size or 'Без розміру'}"
+
+    @property
+    def unit_of_measurement(self):
+        return self.product.unit_of_measurement
 
 
 class UnitOfMeasurement(models.Model):

@@ -21,7 +21,7 @@ class ProductAdminForm(forms.ModelForm):
             has_variants = self.data.get('has_variants') in ['true', 'True', '1', 'on']
 
         # Залежно від has_variants виставляємо required
-        make_optional = ['color', 'size', 'price', 'quantity', 'unit_of_measurement']
+        make_optional = ['color', 'size', 'price', 'quantity']
         for field in make_optional:
             self.fields[field].required = not has_variants
 

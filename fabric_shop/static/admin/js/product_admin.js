@@ -6,8 +6,7 @@ document.addEventListener('DOMContentLoaded', function () {
         { selector: '.form-row.field-price', field: '#id_price' },
         { selector: '.form-row.field-color', field: '#id_color' },
         { selector: '.form-row.field-size', field: '#id_size' },
-        { selector: '.form-row.field-image', field: '#id_image' },
-        { selector: '.form-row.field-unit_of_measurement', field: '#id_unit_of_measurement' }
+
     ];
 
     function toggleFields() {

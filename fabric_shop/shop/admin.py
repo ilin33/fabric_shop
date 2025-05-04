@@ -36,7 +36,7 @@ class SubcategoryAdmin(ImagePreviewMixin, admin.ModelAdmin):
 class ProductVariantInline(admin.TabularInline):
     model = ProductVariant
     extra = 1
-    fields = ['color', 'size', 'quantity', 'price', 'image', 'unit_of_measurement']
+    fields = ['color', 'size', 'quantity', 'price', 'image' ]
 
 
 @admin.register(Product)
@@ -62,13 +62,17 @@ class ProductAdmin(ImagePreviewMixin, admin.ModelAdmin):
 class ProductVariantAdmin(ImagePreviewMixin, admin.ModelAdmin):
     list_display = [
         'product', 'color', 'size', 'quantity', 'price',
-        'unit_of_measurement', 'image_preview'
+         'image_preview', 'get_unit_of_measurement'
     ]
     list_filter = ['product', 'color', 'size']
     search_fields = ['product__name', 'color', 'size']
 
+    @admin.display(description="Одиниця вимірювання")
+    def get_unit_of_measurement(self, obj):
+        return obj.unit_of_measurement
 
 @admin.register(UnitOfMeasurement)
 class UnitOfMeasurementAdmin(admin.ModelAdmin):
     list_display = ['name', 'abbreviation']
     search_fields = ['name', 'abbreviation']
+
