@@ -1,0 +1,30 @@
+{% extends "shop/base.html" %}
+
+{% block title %}{{ category.name }} - Підкатегорії{% endblock %}
+
+{% block content %}
+<section class="py-5">
+  <div class="container px-4 px-lg-5">
+    <h2 class="text-center mb-4">{{ category.name }} — підкатегорії</h2>
+    <div class="row gx-4 gx-lg-5">
+
+      {% for sub in subcategories %}
+      <div class="col-md-4 mb-5">
+        <div class="card h-100 text-center">
+          {% if sub.image %}
+            <img class="card-img-top" src="{{ sub.image.url }}" alt="{{ sub.name }}">
+          {% endif %}
+          <div class="card-body">
+            <h5 class="card-title">{{ sub.name }}</h5>
+          </div>
+          <div class="card-footer bg-transparent">
+            <a class="btn btn-outline-dark" href="#">Переглянути товари</a>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+
+    </div>
+  </div>
+</section>
+{% endblock %}

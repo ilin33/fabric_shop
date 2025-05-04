@@ -51,7 +51,7 @@
             <p class="card-text">{{ category.description }}</p>
         </div>
         <div class="card-footer bg-transparent">
-            <a class="btn btn-outline-dark" href="#">Переглянути</a>
+            <a class="btn btn-outline-dark" href="{% url 'shop:category_detail' category.slug %}">Переглянути</a>
         </div>
       </div>
     </div>
