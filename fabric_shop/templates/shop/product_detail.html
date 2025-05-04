@@ -15,27 +15,83 @@
 <div class="container py-5">
   <div class="row">
     <div class="col-md-6">
-      {% if product.image %}
-      <img src="{{ product.image.url }}" class="img-fluid" alt="{{ product.name }}">
-      {% endif %}
+      <img id="product-image" src="{{ product.image.url }}" class="img-fluid" alt="{{ product.name }}">
     </div>
     <div class="col-md-6">
       <h2>{{ product.name }}</h2>
       {% if product.description %}
       <p>{{ product.description }}</p>
       {% endif %}
+
       {% if product.has_variants %}
-        <p>Доступні варіанти:</p>
-        <ul>
-          {% for variant in product.variants.all %}
-          <li>{{ variant.color }} {{ variant.size }} — {{ variant.price }} грн ({{ variant.unit_of_measurement }})</li>
-          {% endfor %}
-        </ul>
+        <form method="POST" action="{% url 'shop:add_to_cart' product.slug %}">
+          {% csrf_token %}
+
+          <div class="mb-3">
+            <label for="color" class="form-label">Колір</label>
+            <select id="color" class="form-select" name="color" required>
+              <option value="">Виберіть колір</option>
+              {% for variant in variants %}
+                <option value="{{ variant.color }}" data-image="{{ variant.image.url }}" data-price="{{ variant.price }}" data-size="{{ variant.size }}">{{ variant.color }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label for="size" class="form-label">Розмір</label>
+            <select id="size" class="form-select" name="size" required>
+              <option value="">Виберіть розмір</option>
+              {% for variant in variants %}
+                <option value="{{ variant.size }}" data-price="{{ variant.price }}">{{ variant.size }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div id="price" class="mb-3">
+            <strong>Ціна: </strong><span>{{ product.price }} грн</span>
+          </div>
+
+          <button type="submit" class="btn btn-primary">Додати до корзини</button>
+        </form>
       {% else %}
         <p><strong>Ціна:</strong> {{ product.price }} грн</p>
         <p><strong>Кількість на складі:</strong> {{ product.quantity }} {{ product.unit_of_measurement }}</p>
+        <form method="POST" action="{% url 'shop:add_to_cart' product.slug %}">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-primary">Додати до корзини</button>
+        </form>
       {% endif %}
     </div>
   </div>
 </div>
+
+{% block extra_js %}
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const colorSelect = document.getElementById('color');
+    const sizeSelect = document.getElementById('size');
+    const priceDisplay = document.getElementById('price').querySelector('span');
+    const imageDisplay = document.getElementById('product-image');
+
+    function updateProductDetails() {
+      const selectedColor = colorSelect.selectedOptions[0];
+      const selectedSize = sizeSelect.selectedOptions[0];
+
+      if (selectedColor) {
+        // Оновлюємо картинку та ціну для обраного кольору
+        imageDisplay.src = selectedColor.getAttribute('data-image');
+        priceDisplay.textContent = selectedColor.getAttribute('data-price') + ' грн';
+      }
+
+      if (selectedSize) {
+        // Якщо розмір також вибрано, оновлюємо ціну для вибраного розміру
+        priceDisplay.textContent = selectedSize.getAttribute('data-price') + ' грн';
+      }
+    }
+
+    colorSelect.addEventListener('change', updateProductDetails);
+    sizeSelect.addEventListener('change', updateProductDetails);
+  });
+</script>
+{% endblock %}
 {% endblock %}

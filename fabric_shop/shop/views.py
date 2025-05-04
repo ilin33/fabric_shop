@@ -35,4 +35,16 @@ def subcategory_detail(request, slug):
 
 def product_detail(request, slug):
     product = get_object_or_404(Product, slug=slug)
-    return render(request, 'shop/product_detail.html', {'product': product})
+    variants = product.variants.all() if product.has_variants else []
+
+    context = {
+        'product': product,
+        'variants': variants,
+    }
+    return render(request, 'shop/product_detail.html', context)
+
+def add_to_cart(request, product_slug):
+    # Логіка додавання товару в корзину
+    product = get_object_or_404(Product, slug=product_slug)
+    # Логіка для додавання товару до сесії або корзини користувача
+    return redirect('shop:cart_detail')  # Перенаправлення до корзини або іншої сторінки
