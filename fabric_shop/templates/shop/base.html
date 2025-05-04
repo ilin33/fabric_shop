@@ -25,6 +25,15 @@
     {% block slider %}
     {% endblock %}
 
+    {% if request.path != '/' %}
+        <nav aria-label="breadcrumb" class="mt-3 ms-3">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'shop:home' %}">Головна</a></li>
+                    {% block breadcrumbs %}{% endblock %}
+            </ol>
+        </nav>
+    {% endif %}
+
     {% block content %}
     {% endblock %}
 

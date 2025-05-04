@@ -1,5 +1,9 @@
 {% extends "shop/base.html" %}
 
+{% block breadcrumbs %}
+  <li class="breadcrumb-item active" aria-current="page">{{ category.name }}</li>
+{% endblock %}
+
 {% block title %}{{ category.name }} - Підкатегорії{% endblock %}
 
 {% block content %}
@@ -18,7 +22,7 @@
             <h5 class="card-title">{{ sub.name }}</h5>
           </div>
           <div class="card-footer bg-transparent">
-            <a class="btn btn-outline-dark" href="#">Переглянути товари</a>
+            <a class="btn btn-outline-dark" href="{% url 'shop:subcategory_detail' sub.slug %}">Переглянути товари</a>
           </div>
         </div>
       </div>

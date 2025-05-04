@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from django.shortcuts import render
-from .models import SliderImage, Category
+from .models import SliderImage, Category, Subcategory
 
 from django.conf import settings
 
@@ -22,4 +22,12 @@ def category_detail(request, slug):
     return render(request, 'shop/category_detail.html', {
         'category': category,
         'subcategories': subcategories
+    })
+
+def subcategory_detail(request, slug):
+    subcategory = get_object_or_404(Subcategory, slug=slug)
+    products = subcategory.products.all()
+    return render(request, 'shop/subcategory_detail.html', {
+        'subcategory': subcategory,
+        'products': products
     })

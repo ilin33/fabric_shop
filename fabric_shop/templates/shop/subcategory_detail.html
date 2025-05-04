@@ -1,0 +1,43 @@
+{% extends "shop/base.html" %}
+
+{% block breadcrumbs %}
+  <li class="breadcrumb-item"><a href="{% url 'shop:category_detail' subcategory.category.slug %}">{{ subcategory.category.name }}</a></li>
+  <li class="breadcrumb-item active" aria-current="page">{{ subcategory.name }}</li>
+{% endblock %}
+
+{% block title %}{{ subcategory.name }} - Товари{% endblock %}
+
+{% block content %}
+<section class="py-5">
+  <div class="container px-4 px-lg-5">
+    <h2 class="text-center mb-4">{{ subcategory.name }}</h2>
+
+    {% if products %}
+      <div class="row gx-4 gx-lg-5">
+        {% for product in products %}
+          <div class="col-md-4 mb-5">
+            <div class="card h-100 text-center">
+              {% if product.image %}
+                <img class="card-img-top" src="{{ product.image.url }}" alt="{{ product.name }}">
+              {% endif %}
+              <div class="card-body">
+                <h5 class="card-title">{{ product.name }}</h5>
+                {% if not product.has_variants %}
+                  <p class="card-text">{{ product.price }} грн / {{ product.unit_of_measurement }}</p>
+                {% else %}
+                  <p class="card-text text-muted">Доступні варіанти</p>
+                {% endif %}
+              </div>
+              <div class="card-footer bg-transparent">
+                <a class="btn btn-outline-dark" href="#">Детальніше</a>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="text-center">У цій підкатегорії поки немає товарів.</p>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}
