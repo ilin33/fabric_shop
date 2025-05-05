@@ -1,5 +1,7 @@
 {% extends "shop/base.html" %}
 
+{% load static %}  <!-- Додано завантаження тегу static -->
+
 {% block breadcrumbs %}
   <li class="breadcrumb-item"><a href="{% url 'shop:category_detail' subcategory.category.slug %}">{{ subcategory.category.name }}</a></li>
   <li class="breadcrumb-item active" aria-current="page">{{ subcategory.name }}</li>
@@ -19,6 +21,8 @@
             <div class="card h-100 text-center">
               {% if product.image %}
                 <img class="card-img-top" src="{{ product.image.url }}" alt="{{ product.name }}">
+              {% else %}
+                <img class="card-img-top" src="{% static 'img/no-image.png' %}" alt="Без зображення">
               {% endif %}
               <div class="card-body">
                 <h5 class="card-title">{{ product.name }}</h5>
