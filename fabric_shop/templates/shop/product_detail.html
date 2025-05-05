@@ -32,12 +32,8 @@
             <label for="color" class="form-label">Колір</label>
             <select id="color" class="form-select" name="color">
               <option value="">Виберіть колір</option>
-              {% for variant in variants %}
-                {% if variant.color %}
-                  <option value="{{ variant.color }}" data-image="{{ variant.image.url }}" data-price="{{ variant.price }}" data-size="{{ variant.size }}" data-stock="{{ variant.quantity }}">
-                    {{ variant.color }}
-                  </option>
-                {% endif %}
+              {% for color in unique_colors %}
+                <option value="{{ color }}">{{ color }}</option>
               {% endfor %}
             </select>
           </div>
@@ -50,10 +46,8 @@
             </label>
             <select id="size" class="form-select" name="size">
               <option value="">Виберіть розмір</option>
-              {% for variant in variants %}
-                {% if variant.size %}
-                  <option value="{{ variant.size }}" data-price="{{ variant.price }}" data-stock="{{ variant.quantity }}">{{ variant.size }}</option>
-                {% endif %}
+              {% for size in unique_sizes %}
+                <option value="{{ size }}">{{ size }}</option>
               {% endfor %}
             </select>
           </div>
@@ -72,13 +66,13 @@
 
       {% else %}
         <p><strong>Ціна:</strong> {{ product.price }} грн</p>
-      <p><strong>Наявність:</strong>
-        {% if product.quantity > 0 %}
-        <span style="color: green; font-weight: bold;">В наявності</span>
-        {% else %}
-        <span style="color: red; font-weight: bold;">Немає в наявності</span>
-        {% endif %}
-      </p>
+        <p><strong>Наявність:</strong>
+          {% if product.quantity > 0 %}
+          <span style="color: green; font-weight: bold;">В наявності</span>
+          {% else %}
+          <span style="color: red; font-weight: bold;">Немає в наявності</span>
+          {% endif %}
+        </p>
         <form method="POST" action="{% url 'shop:add_to_cart' product.slug %}">
           {% csrf_token %}
           <button type="submit" class="btn btn-primary" id="add-to-cart-btn" {% if product.quantity == 0 %} disabled {% endif %}>Додати до корзини</button>
@@ -97,7 +91,6 @@
     const imageDisplay = document.getElementById('product-image');
     const addToCartBtn = document.getElementById('add-to-cart-btn');
 
-    // Варіанти у форматі JS-об'єкта
     const variants = [
       {% for variant in variants %}
         {
@@ -127,28 +120,28 @@
           priceDisplay.textContent = matchedVariant.price + ' грн';
         }
 
-        // Оновлення статусу наявності
-       if (matchedVariant.quantity > 0) {
-  stockDisplay.textContent = 'В наявності';
-  stockDisplay.style.color = 'green'; // Зелений колір
-  stockDisplay.style.fontWeight = 'bold'; // Жирний текст
-  addToCartBtn.disabled = false; // Активуємо кнопку
-} else {
-  stockDisplay.textContent = 'Немає в наявності';
-  stockDisplay.style.color = 'red'; // Червоний колір
-  stockDisplay.style.fontWeight = 'bold'; // Жирний текст
-  addToCartBtn.disabled = true; // Блокуємо кнопку
-}
+        if (matchedVariant.quantity > 0) {
+          stockDisplay.textContent = 'В наявності';
+          stockDisplay.style.color = 'green';
+          stockDisplay.style.fontWeight = 'bold';
+          addToCartBtn.disabled = false;
+        } else {
+          stockDisplay.textContent = 'Немає в наявності';
+          stockDisplay.style.color = 'red';
+          stockDisplay.style.fontWeight = 'bold';
+          addToCartBtn.disabled = true;
+        }
       } else {
         stockDisplay.textContent = '—';
+        stockDisplay.style.color = '';
+        stockDisplay.style.fontWeight = '';
+        addToCartBtn.disabled = true;
       }
     }
 
-    // Слухачі подій для вибору кольору та розміру
     if (colorSelect) colorSelect.addEventListener('change', updateProductDetails);
     if (sizeSelect) sizeSelect.addEventListener('change', updateProductDetails);
 
-    // Ініціалізація статусу наявності при завантаженні сторінки
     updateProductDetails();
   });
 </script>
