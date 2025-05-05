@@ -25,7 +25,7 @@
                 {% if not product.has_variants %}
                   <p class="card-text">{{ product.price }} грн / {{ product.unit_of_measurement }}</p>
                 {% else %}
-                  <p class="card-text text-muted">Доступні варіанти</p>
+                  <p class="card-text text-success fw-bold">Доступні варіанти</p>
                 {% endif %}
               </div>
               <div class="card-footer bg-transparent">

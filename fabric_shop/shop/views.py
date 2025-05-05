@@ -37,9 +37,15 @@ def product_detail(request, slug):
     product = get_object_or_404(Product, slug=slug)
     variants = product.variants.all() if product.has_variants else []
 
+    # Додаємо логіку перевірки, чи є хоч один варіант з color або size
+    show_color = any(v.color for v in variants)
+    show_size = any(v.size for v in variants)
+
     context = {
         'product': product,
         'variants': variants,
+        'show_color': show_color,
+        'show_size': show_size,
     }
     return render(request, 'shop/product_detail.html', context)
 
