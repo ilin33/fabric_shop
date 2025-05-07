@@ -1,7 +1,8 @@
-from django.shortcuts import render, get_object_or_404
+from django.db.models import Q
+from django.shortcuts import render, get_object_or_404, redirect
 from django.shortcuts import render
 from .models import SliderImage, Category, Subcategory, Product
-
+from rapidfuzz import fuzz
 from django.conf import settings
 
 def home(request):
@@ -59,3 +60,35 @@ def add_to_cart(request, product_slug):
     product = get_object_or_404(Product, slug=product_slug)
     # Логіка для додавання товару до сесії або корзини користувача
     return redirect('shop:cart_detail')  # Перенаправлення до корзини або іншої сторінки
+
+
+def search(request):
+    query = request.GET.get('q', '').strip()
+    products = []
+
+    if query:
+        all_products = Product.objects.all()
+        matched = []
+
+        for product in all_products:
+            name_score = fuzz.partial_ratio(query.lower(), product.name.lower())
+            description_words = product.description.split() if product.description else []
+            desc_score = max(
+                [fuzz.partial_ratio(query.lower(), word.lower()) for word in description_words],
+                default=0
+            )
+            max_score = max(name_score, desc_score)
+
+            if max_score > 80:
+                matched.append((product, max_score))
+
+        # Сортуємо за max_score у зворотному порядку
+        matched.sort(key=lambda x: x[1], reverse=True)
+
+        # Витягуємо продукти зі списку кортежів
+        products = [item[0] for item in matched]
+
+    return render(request, 'shop/search_results.html', {
+        'query': query,
+        'products': products,
+    })

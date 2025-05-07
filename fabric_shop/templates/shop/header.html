@@ -36,9 +36,9 @@
 <header class="bg-dark py-2">
     <div class="container px-4 px-lg-5 my-2">
         <div class="d-flex justify-content-center">
-            <form class="d-flex">
-                <input class="form-control me-2" type="search" placeholder="Search products" aria-label="Search" style="max-width: 250px; width: 100%;">
-                <button class="btn btn-outline-light" type="submit">Search</button>
+            <form method="get" action="{% url 'shop:search' %}">
+                <input type="text" name="q" placeholder="Шукати продукти..." value="{{ query }}" required>
+                <button type="submit">Пошук</button>
             </form>
         </div>
     </div>

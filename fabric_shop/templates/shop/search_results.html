@@ -1,0 +1,34 @@
+{% extends "shop/base.html" %}
+
+{% load static %}
+
+{% block title %}Результати пошуку: {{ query }}{% endblock %}
+
+{% block breadcrumbs %}
+  <li class="breadcrumb-item active" aria-current="page">Пошук: "{{ query }}"</li>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <h2>Результати пошуку</h2>
+
+  {% if products %}
+    <div class="row">
+      {% for product in products %}
+        <div class="col-md-4">
+          <div class="card">
+            <img src="{% if product.image %}{{ product.image.url }}{% else %}{% static 'img/no-image.png' %}{% endif %}" class="card-img-top" alt="{{ product.name }}">
+            <div class="card-body">
+              <h5 class="card-title">{{ product.name }}</h5>
+              <p class="card-text">{{ product.description|slice:":150" }}...</p>
+              <a href="{% url 'shop:product_detail' product.slug %}" class="btn btn-primary">Детальніше</a>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p>Продукти не знайдено.</p>
+  {% endif %}
+</div>
+{% endblock %}
