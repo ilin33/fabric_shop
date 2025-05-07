@@ -22,6 +22,7 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('shop.urls')),  # підключаємо URLs магазину
+    path('about/', include('info.urls')),  # підключення про нас
 ]
 
 if settings.DEBUG:
