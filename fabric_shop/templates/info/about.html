@@ -1,4 +1,4 @@
-{% extends 'shop/base.html' %}
+{% extends 'base.html' %}
 {% block title %}Про нас{% endblock %}
 
 {% block breadcrumbs %}
@@ -42,7 +42,7 @@
             <button type="submit" class="btn btn-primary">Надіслати</button>
         </form>
     {% else %}
-        <p><a href="{% url 'login' %}?next={% url 'info:about' %}">Увійдіть</a>, щоб залишити відгук.</p>
+        <p><a href="#">Увійдіть</a>, щоб залишити відгук.</p>
     {% endif %}
 </div>
 {% endblock %}
