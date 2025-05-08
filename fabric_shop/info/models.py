@@ -6,7 +6,8 @@ class SiteInfo(models.Model):
     working_hours = models.CharField(max_length=255, verbose_name="Графік роботи")
     address = models.CharField(max_length=255, verbose_name="Адреса")
     phone = models.CharField(max_length=50, verbose_name="Телефон")
-    email = models.EmailField(verbose_name="Email")
+    image = models.ImageField(upload_to='site_images/', null=True, blank=True, verbose_name="Зображення")
+
 
     def __str__(self):
         return "Інформація про сайт"

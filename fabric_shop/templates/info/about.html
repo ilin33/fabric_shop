@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+
 {% block title %}Про нас{% endblock %}
 
 {% block breadcrumbs %}
@@ -8,14 +9,21 @@
 {% block content %}
 <div class="container my-4">
     <h1 class="mb-4">Про нас</h1>
+
     {% if site_info %}
-        <p>{{ site_info.about_text|linebreaks }}</p>
+        <div class="clearfix mb-4">
+            {% if site_info.image %}
+                <img src="{{ site_info.image.url }}" alt="Фото магазину"
+                     class="img-fluid rounded shadow-sm float-md-end ms-md-3 mb-3"
+                     style="max-width: 500px; height: auto;">
+            {% endif %}
+            <p>{{ site_info.about_text|linebreaks }}</p>
+        </div>
 
         <h4 class="mt-4">Контакти</h4>
         <ul class="list-unstyled">
             <li><strong>Адреса:</strong> {{ site_info.address }}</li>
             <li><strong>Телефон:</strong> {{ site_info.phone }}</li>
-            <li><strong>Email:</strong> {{ site_info.email }}</li>
             <li><strong>Графік роботи:</strong> {{ site_info.working_hours }}</li>
         </ul>
     {% else %}
@@ -23,16 +31,35 @@
     {% endif %}
 
     <h4 class="mt-5">Відгуки клієнтів</h4>
-    {% for t in testimonials %}
-        <div class="card my-3">
-            <div class="card-body">
+    {% for t in page_obj %}
+        <div class="card my-2">
+            <div class="card-body py-0 px-3">
                 <p>{{ t.text|linebreaks }}</p>
-                <small class="text-muted">— {{ t.user.username }}, {{ t.created_at|date:"d.m.Y H:i" }}</small>
+                <small class="text-muted">— {{ t.user.first_name }}, {{ t.created_at|date:"d.m.Y H:i" }}</small>
             </div>
         </div>
     {% empty %}
         <p>Ще немає відгуків.</p>
     {% endfor %}
+
+    <!-- Пагінація -->
+    <div class="pagination mt-3">
+        <span class="step-links">
+            {% if page_obj.has_previous %}
+                <a href="?page=1">&laquo; Перша</a>
+                <a href="?page={{ page_obj.previous_page_number }}">« Попередня</a>
+            {% endif %}
+
+            <span class="current">
+                Сторінка {{ page_obj.number }} з {{ page_obj.paginator.num_pages }}.
+            </span>
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}">Наступна »</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}">Остання »</a>
+            {% endif %}
+        </span>
+    </div>
 
     {% if user.is_authenticated %}
         <h5 class="mt-4">Залишити відгук</h5>
@@ -42,7 +69,7 @@
             <button type="submit" class="btn btn-primary">Надіслати</button>
         </form>
     {% else %}
-       <p><a href="{% url 'account_login' %}">Увійдіть</a>, щоб залишити відгук.</p>
+        <p><a href="{% url 'account_login' %}">Увійдіть</a>, щоб залишити відгук.</p>
     {% endif %}
 </div>
 {% endblock %}

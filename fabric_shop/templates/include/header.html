@@ -1,3 +1,5 @@
+{% load socialaccount %}
+
 <!-- Navigation-->
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container px-4 px-lg-5">
@@ -37,6 +39,18 @@
                     </ul>
                 </li>
             </ul>
+
+            <!-- User Login/Logout Section -->
+            <div class="d-flex align-items-center me-3">
+                {% if user.is_authenticated %}
+                    <span class="me-2">Привіт, {{ user.first_name }}!</span>
+                    <a class="btn btn-outline-dark btn-sm" href="{% url 'account_logout' %}">Вийти</a>
+                {% else %}
+                    <a class="btn btn-outline-dark btn-sm" href="{% provider_login_url 'google' %}">Увійти через Google</a>
+                {% endif %}
+            </div>
+
+            <!-- Cart Button -->
             <form class="d-flex">
                 <button class="btn btn-outline-dark" type="submit">
                     <i class="bi-cart-fill me-1"></i>
