@@ -18,11 +18,16 @@ from django.conf import settings
 from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls.static import static
+from info.views import CustomLoginView
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('shop.urls')),  # підключаємо URLs магазину
     path('about/', include('info.urls')),  # підключення про нас
+    path('accounts/login/', CustomLoginView.as_view(), name='account_login'),  # кастомний логін
+    path('accounts/', include('allauth.urls')), # автентифікація
+
 ]
 
 if settings.DEBUG:

@@ -5,6 +5,9 @@ from .models import SliderImage, Category, Subcategory, Product
 from rapidfuzz import fuzz
 from django.conf import settings
 
+
+
+
 def home(request):
     slides = SliderImage.objects.order_by('order')
     categories = Category.objects.all()

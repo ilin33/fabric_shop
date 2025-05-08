@@ -1,7 +1,13 @@
 from django.shortcuts import render, redirect
 from .models import SiteInfo, Testimonial
 from .forms import TestimonialForm
-from django.contrib.auth.decorators import login_required
+
+from django.contrib.auth.views import LoginView
+
+
+class CustomLoginView(LoginView):
+    template_name = 'registration/login.html'
+
 
 def about_view(request):
     site_info = SiteInfo.objects.first()
@@ -25,3 +31,5 @@ def about_view(request):
         'testimonials': testimonials,
         'form': form,
     })
+
+
