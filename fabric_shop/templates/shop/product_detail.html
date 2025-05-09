@@ -1,6 +1,5 @@
 {% extends "base.html" %}
-
-{% load static %}  <!-- Додано завантаження тегу static -->
+{% load static %}
 
 {% block title %}{{ product.name }}{% endblock %}
 
@@ -31,7 +30,7 @@
       {% endif %}
 
       {% if product.has_variants %}
-        <form method="POST" action="{% url 'shop:add_to_cart' product.slug %}">
+        <form method="POST" action="{% url 'cart:add_to_cart' product.slug %}">
           {% csrf_token %}
 
           {% if show_color %}
@@ -60,6 +59,11 @@
           </div>
           {% endif %}
 
+          <div class="mb-3">
+            <label for="quantity" class="form-label">Кількість</label>
+            <input type="number" class="form-control" name="quantity" id="quantity" value="1" min="1">
+          </div>
+
           <div id="price" class="mb-3">
             <strong>Ціна: </strong><span>{{ product.price }} грн</span>
           </div>
@@ -75,19 +79,73 @@
         <p><strong>Ціна:</strong> {{ product.price }} грн</p>
         <p><strong>Наявність:</strong>
           {% if product.quantity > 0 %}
-          <span style="color: green; font-weight: bold;">В наявності</span>
+            <span style="color: green; font-weight: bold;">В наявності</span>
           {% else %}
-          <span style="color: red; font-weight: bold;">Немає в наявності</span>
+            <span style="color: red; font-weight: bold;">Немає в наявності</span>
           {% endif %}
         </p>
-        <form method="POST" action="{% url 'shop:add_to_cart' product.slug %}">
+
+        <form action="{% url 'cart:add_to_cart' product.slug %}" method="POST">
           {% csrf_token %}
+          <div class="mb-3">
+            <label for="quantity" class="form-label">Кількість</label>
+            <input type="number" class="form-control" name="quantity" id="quantity" value="1" min="1" {% if product.quantity == 0 %}disabled{% endif %}>
+          </div>
           <button type="submit" class="btn btn-primary" id="add-to-cart-btn" {% if product.quantity == 0 %} disabled {% endif %}>Додати до корзини</button>
         </form>
       {% endif %}
     </div>
   </div>
+
+  <!-- Коментарі -->
+  <div class="row mt-5">
+    <div class="col-md-8 offset-md-2">
+      <h4 class="mb-3">Коментарі до товару</h4>
+
+      {% for comment in page_obj %}
+        <div class="card my-2">
+          <div class="card-body py-2 px-3">
+            <p>{{ comment.text|linebreaks }}</p>
+            <small class="text-muted">— {{ comment.user.first_name|default:comment.user.username }}, {{ comment.created_at|date:"d.m.Y H:i" }}</small>
+          </div>
+        </div>
+      {% empty %}
+        <p>Ще немає коментарів.</p>
+      {% endfor %}
+
+      <!-- Пагінація -->
+      <div class="pagination mt-3">
+        <span class="step-links">
+          {% if page_obj.has_previous %}
+            <a href="?page=1">&laquo; Перша</a>
+            <a href="?page={{ page_obj.previous_page_number }}">« Попередня</a>
+          {% endif %}
+
+          <span class="current">Сторінка {{ page_obj.number }} з {{ page_obj.paginator.num_pages }}</span>
+
+          {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">Наступна »</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}">Остання »</a>
+          {% endif %}
+        </span>
+      </div>
+
+      <!-- Форма додавання коментаря -->
+      {% if user.is_authenticated %}
+        <h5 class="mt-4">Залишити коментар</h5>
+        <form method="post">
+          {% csrf_token %}
+          {{ form.as_p }}
+          <button type="submit" class="btn btn-primary">Надіслати</button>
+        </form>
+      {% else %}
+        <p>Увійдіть через <a href="{% url 'account_login' %}">Google аккаунт</a>, щоб залишити коментар.</p>
+      {% endif %}
+    </div>
+  </div>
 </div>
+{% endblock %}
+
 {% block extra_js %}
 <script>
   document.addEventListener("DOMContentLoaded", function() {
@@ -152,5 +210,4 @@
     updateProductDetails();
   });
 </script>
-{% endblock %}
 {% endblock %}

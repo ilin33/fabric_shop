@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.exceptions import ValidationError
+from django.contrib.auth.models import User
 
 
 class SliderImage(models.Model):
@@ -117,5 +118,20 @@ class UnitOfMeasurement(models.Model):
     class Meta:
         verbose_name = "Одиниця вимірювання"
         verbose_name_plural = "Одиниці вимірювання"
+
+
+class ProductComment(models.Model):
+    product = models.ForeignKey('Product', on_delete=models.CASCADE, related_name='comments')
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    text = models.TextField(verbose_name="Коментар")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Коментар до товару"
+        verbose_name_plural = "Коментарі до товарів"
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.user} — {self.product.name}"
 
 

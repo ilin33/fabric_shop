@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.utils.html import format_html
 from .models import (
     SliderImage, Category, Subcategory,
-    Product, ProductVariant, UnitOfMeasurement
+    Product, ProductVariant, UnitOfMeasurement, ProductComment
 )
 from .forms import ProductAdminForm
 
@@ -76,3 +76,8 @@ class UnitOfMeasurementAdmin(admin.ModelAdmin):
     list_display = ['name', 'abbreviation']
     search_fields = ['name', 'abbreviation']
 
+@admin.register(ProductComment)
+class ProductCommentAdmin(admin.ModelAdmin):
+    list_display = ('product', 'user', 'created_at')
+    list_filter = ('created_at',)
+    search_fields = ('text', 'user__username', 'product__name')

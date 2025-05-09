@@ -20,7 +20,7 @@
             <p>{{ site_info.about_text|linebreaks }}</p>
         </div>
 
-        <h4 class="mt-4">Контакти</h4>
+        <h4 class="mt-4" id="contacts">Контакти</h4>
         <ul class="list-unstyled">
             <li><strong>Адреса:</strong> {{ site_info.address }}</li>
             <li><strong>Телефон:</strong> {{ site_info.phone }}</li>
@@ -69,7 +69,7 @@
             <button type="submit" class="btn btn-primary">Надіслати</button>
         </form>
     {% else %}
-        <p><a href="{% url 'account_login' %}">Увійдіть</a>, щоб залишити відгук.</p>
+        <p>Увійдіть через<a href="{% url 'account_login' %}"> Google account</a>, щоб залишити відгук.</p>
     {% endif %}
 </div>
 {% endblock %}

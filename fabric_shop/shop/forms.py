@@ -1,5 +1,5 @@
 from django import forms
-from .models import Product
+from .models import Product, ProductComment
 
 
 class ProductAdminForm(forms.ModelForm):
@@ -27,3 +27,12 @@ class ProductAdminForm(forms.ModelForm):
 
     class Media:
         js = ('admin/js/product_admin.js',)
+
+
+class ProductCommentForm(forms.ModelForm):
+    class Meta:
+        model = ProductComment
+        fields = ['text']
+        widgets = {
+            'text': forms.Textarea(attrs={'rows': 4, 'placeholder': 'Ваш коментар...'}),
+        }

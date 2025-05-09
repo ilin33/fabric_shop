@@ -1,9 +1,10 @@
-from django.db.models import Q
 from django.shortcuts import render, get_object_or_404, redirect
 from django.shortcuts import render
-from .models import SliderImage, Category, Subcategory, Product
+from .models import SliderImage, Category, Subcategory, Product, ProductComment
 from rapidfuzz import fuzz
 from django.conf import settings
+from .forms import ProductCommentForm
+from django.core.paginator import Paginator
 
 
 
@@ -44,9 +45,25 @@ def product_detail(request, slug):
     show_color = any(v.color for v in variants)
     show_size = any(v.size for v in variants)
 
-    # Отримуємо унікальні кольори та розміри
     unique_colors = sorted(set(v.color for v in variants if v.color))
     unique_sizes = sorted(set(v.size for v in variants if v.size))
+
+    # Обробка коментарів
+    comments = ProductComment.objects.filter(product=product)
+    paginator = Paginator(comments, 5)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+
+    if request.method == "POST" and request.user.is_authenticated:
+        form = ProductCommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.product = product
+            comment.user = request.user
+            comment.save()
+            return redirect('shop:product_detail', slug=slug)
+    else:
+        form = ProductCommentForm()
 
     context = {
         'product': product,
@@ -55,7 +72,10 @@ def product_detail(request, slug):
         'show_size': show_size,
         'unique_colors': unique_colors,
         'unique_sizes': unique_sizes,
+        'form': form,
+        'page_obj': page_obj,
     }
+
     return render(request, 'shop/product_detail.html', context)
 
 def add_to_cart(request, product_slug):

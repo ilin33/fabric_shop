@@ -27,6 +27,7 @@ urlpatterns = [
     path('about/', include('info.urls')),  # підключення про нас
     path('accounts/login/', CustomLoginView.as_view(), name='account_login'),  # кастомний логін
     path('accounts/', include('allauth.urls')), # автентифікація
+    path('cart/', include('cart.urls', namespace='cart')),
 
 ]
 
