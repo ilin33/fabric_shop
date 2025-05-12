@@ -9,6 +9,7 @@ from django.core.paginator import Paginator
 
 
 
+
 def home(request):
     slides = SliderImage.objects.order_by('order')
     categories = Category.objects.all()
@@ -78,11 +79,7 @@ def product_detail(request, slug):
 
     return render(request, 'shop/product_detail.html', context)
 
-def add_to_cart(request, product_slug):
-    # Логіка додавання товару в корзину
-    product = get_object_or_404(Product, slug=product_slug)
-    # Логіка для додавання товару до сесії або корзини користувача
-    return redirect('shop:cart_detail')  # Перенаправлення до корзини або іншої сторінки
+
 
 
 def search(request):

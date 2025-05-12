@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<h2>Оформлення замовлення</h2>
+
+<form method="post" id="order-form">
+    {% csrf_token %}
+    <p>{{ form.first_name.label }}: {{ form.first_name }}</p>
+    <p>{{ form.last_name.label }}: {{ form.last_name }}</p>
+    <p>{{ form.email.label }}: {{ form.email }}</p>
+
+    <p>
+        {{ form.delivery_method.label_tag }}
+        {{ form.delivery_method }}
+    </p>
+
+    <div id="courier-fields" style="display: none;">
+        <p>{{ form.city.label }}: {{ form.city }}</p>
+        <p>{{ form.address.label }}: {{ form.address }}</p>
+        <p>{{ form.postal_code.label }}: {{ form.postal_code }}</p>
+    </div>
+
+    <div id="nova-poshta-fields" style="display: none;">
+        <p>
+            Місто (Нова Пошта):
+            <input type="text" id="nova-poshta-city" name="nova_poshta_city" list="nova-cities" autocomplete="off">
+            <datalist id="nova-cities"></datalist>
+        </p>
+        <p>
+            Відділення:
+            <select id="nova-poshta-warehouse" name="nova_poshta_warehouse"></select>
+        </p>
+    </div>
+
+    <div id="ukrposhta-fields" style="display: none;">
+        <p>
+            Місто (Укрпошта):
+            <input type="text" id="ukrposhta-city" name="ukrposhta_city" list="ukr-cities" autocomplete="off">
+            <datalist id="ukr-cities"></datalist>
+        </p>
+        <p>
+            Відділення:
+            <select id="ukrposhta-warehouse" name="ukrposhta_warehouse"></select>
+        </p>
+    </div>
+
+    <button type="submit">Оформити замовлення</button>
+</form>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const deliveryMethod = document.querySelector('[name="delivery_method"]');
+    const courierFields = document.getElementById('courier-fields');
+    const novaPoshtaFields = document.getElementById('nova-poshta-fields');
+    const ukrposhtaFields = document.getElementById('ukrposhta-fields');
+
+    function toggleFields() {
+        const method = deliveryMethod.value;
+        courierFields.style.display = method === 'courier' ? 'block' : 'none';
+        novaPoshtaFields.style.display = method === 'nova_poshta' ? 'block' : 'none';
+        ukrposhtaFields.style.display = method === 'ukrposhta' ? 'block' : 'none';
+    }
+
+    deliveryMethod.addEventListener('change', toggleFields);
+    toggleFields();
+
+    // ===== Нова Пошта =====
+    const npCityInput = document.getElementById('nova-poshta-city');
+    const npCityDatalist = document.getElementById('nova-cities');
+    const npWarehouseSelect = document.getElementById('nova-poshta-warehouse');
+
+    let npCityMap = {};
+
+    npCityInput.addEventListener('input', function () {
+        const query = npCityInput.value;
+        if (query.length >= 3) {
+            fetch(`/orders/api/nova-poshta/cities/?q=${query}`)
+                .then(res => res.json())
+                .then(data => {
+                    npCityDatalist.innerHTML = '';
+                    npCityMap = {};
+                    data.forEach(city => {
+                        const option = document.createElement('option');
+                        option.value = city.Description;
+                        npCityDatalist.appendChild(option);
+                        npCityMap[city.Description] = city.Ref;
+                    });
+                });
+        }
+    });
+
+    npCityInput.addEventListener('change', function () {
+        const cityName = npCityInput.value;
+        const cityRef = npCityMap[cityName];
+        if (!cityRef) return;
+
+        fetch(`/orders/api/nova-poshta/warehouses/?city_ref=${cityRef}`)
+            .then(res => res.json())
+            .then(data => {
+                npWarehouseSelect.innerHTML = '';
+                data.forEach(branch => {
+                    const opt = document.createElement('option');
+                    opt.value = branch.Description;
+                    opt.textContent = branch.Description;
+                    npWarehouseSelect.appendChild(opt);
+                });
+            });
+    });
+
+    // ===== Укрпошта =====
+    const upCityInput = document.getElementById('ukrposhta-city');
+    const upCityDatalist = document.getElementById('ukr-cities');
+    const upWarehouseSelect = document.getElementById('ukrposhta-warehouse');
+
+    let upCityMap = {};
+
+    upCityInput.addEventListener('input', function () {
+        const query = upCityInput.value;
+        if (query.length >= 3) {
+            fetch(`/orders/api/ukrposhta/cities/?q=${query}`)
+                .then(res => res.json())
+                .then(data => {
+                    upCityDatalist.innerHTML = '';
+                    upCityMap = {};
+                    data.forEach(city => {
+                        const option = document.createElement('option');
+                        option.value = city.city;
+                        upCityDatalist.appendChild(option);
+                        upCityMap[city.city] = city.id;
+                    });
+                });
+        }
+    });
+
+    upCityInput.addEventListener('change', function () {
+        const cityName = upCityInput.value;
+        const cityId = upCityMap[cityName];
+        if (!cityId) return;
+
+        fetch(`/orders/api/ukrposhta/warehouses/?city_id=${cityId}`)
+            .then(res => res.json())
+            .then(data => {
+                upWarehouseSelect.innerHTML = '';
+                data.forEach(branch => {
+                    const opt = document.createElement('option');
+                    opt.value = branch.name;
+                    opt.textContent = branch.name;
+                    upWarehouseSelect.appendChild(opt);
+                });
+            });
+    });
+});
+</script>
+{% endblock %}

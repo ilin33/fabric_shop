@@ -11,6 +11,11 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 import os.path
 from pathlib import Path
+import os
+from dotenv import load_dotenv
+
+# Завантажуємо змінні середовища з файлу .env
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -44,6 +49,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google',
     'shop',
     'info',
+    'orders',
 
 ]
 
@@ -151,3 +157,9 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Токен для Нової Пошти
+#NOVA_POSHTA_API_TOKEN = os.environ.get('NOVA_POSHTA_API_TOKEN', '')
+
+# Токен для Укрпошти
+#UKRPOSHTA_API_TOKEN = os.environ.get('UKRPOSHTA_API_TOKEN', '')

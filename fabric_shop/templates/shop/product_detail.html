@@ -15,6 +15,14 @@
 
 {% block content %}
 <div class="container py-5">
+  {% if messages %}
+    <div class="alert alert-info">
+      {% for message in messages %}
+        <p>{{ message }}</p>
+      {% endfor %}
+    </div>
+  {% endif %}
+
   <div class="row">
     <div class="col-md-6">
       {% if product.image %}

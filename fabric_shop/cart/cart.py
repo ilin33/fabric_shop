@@ -1,5 +1,6 @@
 from decimal import Decimal
 from shop.models import Product, ProductVariant
+from django.contrib import messages
 
 class Cart:
     def __init__(self, request):
@@ -9,17 +10,56 @@ class Cart:
             cart = self.session['cart'] = {}
         self.cart = cart
 
-    def add(self, product, quantity=1, variant_id=None, override_quantity=False):
+    def add(self, request, product, quantity=1, variant_id=None, override_quantity=False):
         product_id = str(product.id)
         key = f"{product_id}:{variant_id}" if variant_id else product_id
 
-        if key not in self.cart:
-            self.cart[key] = {'quantity': 0, 'price': str(product.price), 'variant_id': variant_id}
+        # Якщо товар має варіанти
+        if variant_id:
+            variant = ProductVariant.objects.get(id=variant_id)
 
-        if override_quantity:
-            self.cart[key]['quantity'] = quantity
+            # Перевіряємо залишки
+            if variant.quantity < quantity:
+                messages.error(request, f"Недостатньо товару на складі: {variant.quantity} одиниць доступно.")
+                return  # Ви можете замінити повідомлення на переадресацію або інше
+
+            # Перевіряємо, скільки вже є в кошику
+            current_quantity = self.cart.get(key, {}).get('quantity', 0)
+            if current_quantity + quantity > variant.quantity:
+                messages.error(request,
+                               f"Не можна додати більше товару, ніж є на складі. Максимум {variant.quantity - current_quantity} одиниць доступно.")
+                return
+
+            # Якщо товару не вистачає, припиняємо додавання
+            if key not in self.cart:
+                self.cart[key] = {'quantity': 0, 'price': str(variant.price), 'variant_id': variant_id}
+
+            if override_quantity:
+                self.cart[key]['quantity'] = quantity
+            else:
+                self.cart[key]['quantity'] += quantity
+
+        # Для товарів без варіантів
         else:
-            self.cart[key]['quantity'] += quantity
+            # Перевіряємо залишки для звичайного товару
+            if product.quantity < quantity:
+                messages.error(request, f"Недостатньо товару на складі: {product.quantity} одиниць доступно.")
+                return  # Ви можете замінити повідомлення на переадресацію або інше
+
+            # Перевіряємо, скільки вже є в кошику
+            current_quantity = self.cart.get(key, {}).get('quantity', 0)
+            if current_quantity + quantity > product.quantity:
+                messages.error(request,
+                               f"Не можна додати більше товару, ніж є на складі. Максимум {product.quantity - current_quantity} одиниць доступно.")
+                return
+
+            if key not in self.cart:
+                self.cart[key] = {'quantity': 0, 'price': str(product.price), 'variant_id': None}
+
+            if override_quantity:
+                self.cart[key]['quantity'] = quantity
+            else:
+                self.cart[key]['quantity'] += quantity
 
         self.save()
 

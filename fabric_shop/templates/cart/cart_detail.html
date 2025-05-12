@@ -34,9 +34,15 @@
               <td>{{ item.price }} грн</td>
               <td>{{ item.total_price }} грн</td>
               <td>
-                <a href="{% url 'cart:remove_from_cart' item.product.id item.variant.id %}" class="btn btn-sm btn-danger">
-                  Видалити
-                </a>
+                {% if item.variant %}
+                  <a href="{% url 'cart:remove_from_cart' item.product.id item.variant.id %}" class="btn btn-sm btn-danger">
+                    Видалити
+                  </a>
+                {% else %}
+                  <a href="{% url 'cart:remove_from_cart' item.product.id %}" class="btn btn-sm btn-danger">
+                    Видалити
+                  </a>
+                {% endif %}
               </td>
             </tr>
           {% endfor %}
@@ -48,7 +54,7 @@
       <h4>Загальна сума: <strong>{{ cart.get_total_price }} грн</strong></h4>
       <div>
         <a href="{% url 'cart:clear_cart' %}" class="btn btn-outline-secondary me-2">Очистити кошик</a>
-        <a href="#" class="btn btn-success">Оформити замовлення</a>
+        <a href="{% url 'orders:order_create' %}" class="btn btn-success">Оформити замовлення</a>
         <a href="{% url 'shop:home' %}" class="btn btn-primary">Продовжити покупки</a>
       </div>
     </div>

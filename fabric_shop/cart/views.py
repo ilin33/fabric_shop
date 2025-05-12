@@ -2,28 +2,41 @@ from django.shortcuts import redirect, get_object_or_404, render
 from shop.models import Product, ProductVariant
 from .cart import Cart
 from django.http import JsonResponse
+from django.contrib import messages
 
 
 def add_to_cart(request, product_slug):
     product = get_object_or_404(Product, slug=product_slug)
     cart = Cart(request)
 
-    variant_id = request.POST.get('variant_id')  # або обробка через color/size
+    variant_id = request.POST.get('variant_id')
     color = request.POST.get('color')
     size = request.POST.get('size')
 
-    # Ось тут витягуємо кількість з POST-запиту, або ставимо 1 за замовчуванням
     quantity = int(request.POST.get('quantity', 1))
 
     variant = None
     if product.has_variants and (color or size):
-        variant = get_object_or_404(ProductVariant, product=product, color=color or '', size=size or '')
-        # Додаємо товар з варіантом і кількістю
-        cart.add(product=product, variant_id=variant.id, quantity=quantity)
-    else:
-        # Додаємо товар без варіантів і кількістю
-        cart.add(product=product, quantity=quantity)
+        variant = get_object_or_404(ProductVariant, product=product, color=color, size=size)
 
+        # Перевірка залишків
+        if variant.quantity < quantity:
+            messages.error(request, f"Недостатньо товару на складі: {variant.quantity} одиниць доступно.")
+            return redirect('shop:product_detail', slug=product_slug)
+
+        # Додаємо товар з варіантом
+        cart.add(request, product=product, variant_id=variant.id, quantity=quantity)
+
+    else:
+        # Перевірка залишків для товарів без варіантів
+        if product.quantity < quantity:
+            messages.error(request, f"Недостатньо товару на складі: {product.quantity} одиниць доступно.")
+            return redirect('shop:product_detail', slug=product_slug)
+
+        # Додаємо товар без варіантів
+        cart.add(request, product=product, quantity=quantity)
+
+    messages.success(request, 'Товар успішно додано до кошика!')
     return redirect('cart:cart_detail')
 
 

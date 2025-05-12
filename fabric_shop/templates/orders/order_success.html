@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}Замовлення оформлено{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="alert alert-success text-center" role="alert">
+        <h4 class="alert-heading">Дякуємо за ваше замовлення!</h4>
+        <p>Ваше замовлення успішно оформлено. Ми надішлемо вам підтвердження на електронну пошту.</p>
+        <hr>
+        <p class="mb-0">Якщо у вас виникнуть питання, зв'яжіться з нашою службою підтримки.</p>
+        <a href="{% url 'shop:home' %}" class="btn btn-primary mt-3">Повернутися до магазину</a>
+    </div>
+</div>
+{% endblock %}
