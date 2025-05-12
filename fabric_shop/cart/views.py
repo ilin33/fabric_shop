@@ -22,22 +22,23 @@ def add_to_cart(request, product_slug):
         # Перевірка залишків
         if variant.quantity < quantity:
             messages.error(request, f"Недостатньо товару на складі: {variant.quantity} одиниць доступно.")
-            return redirect('shop:product_detail', slug=product_slug)
+            return redirect('shop:product_detail', slug=product_slug)  # Залишаємо на сторінці товару
 
         # Додаємо товар з варіантом
-        cart.add(request, product=product, variant_id=variant.id, quantity=quantity)
+        cart.add(product=product, variant_id=variant.id, quantity=quantity)
 
     else:
         # Перевірка залишків для товарів без варіантів
         if product.quantity < quantity:
             messages.error(request, f"Недостатньо товару на складі: {product.quantity} одиниць доступно.")
-            return redirect('shop:product_detail', slug=product_slug)
+            return redirect('shop:product_detail', slug=product_slug)  # Залишаємо на сторінці товару
 
         # Додаємо товар без варіантів
-        cart.add(request, product=product, quantity=quantity)
+        cart.add(product=product, quantity=quantity)
 
     messages.success(request, 'Товар успішно додано до кошика!')
-    return redirect('cart:cart_detail')
+    return redirect('cart:cart_detail')  # Якщо без помилок, редиректимо до кошика
+
 
 
 def cart_detail(request):

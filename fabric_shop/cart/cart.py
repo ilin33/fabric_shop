@@ -5,61 +5,44 @@ from django.contrib import messages
 class Cart:
     def __init__(self, request):
         self.session = request.session
+        self.request = request
         cart = self.session.get('cart')
         if not cart:
             cart = self.session['cart'] = {}
         self.cart = cart
 
-    def add(self, request, product, quantity=1, variant_id=None, override_quantity=False):
+    def add(self, product, quantity=1, variant_id=None, override_quantity=False):
         product_id = str(product.id)
         key = f"{product_id}:{variant_id}" if variant_id else product_id
+
+        # Отримуємо поточну кількість товару в кошику
+        current_quantity = self.cart.get(key, {}).get('quantity', 0)
+        total_quantity = current_quantity + quantity if not override_quantity else quantity
 
         # Якщо товар має варіанти
         if variant_id:
             variant = ProductVariant.objects.get(id=variant_id)
 
             # Перевіряємо залишки
-            if variant.quantity < quantity:
-                messages.error(request, f"Недостатньо товару на складі: {variant.quantity} одиниць доступно.")
-                return  # Ви можете замінити повідомлення на переадресацію або інше
-
-            # Перевіряємо, скільки вже є в кошику
-            current_quantity = self.cart.get(key, {}).get('quantity', 0)
-            if current_quantity + quantity > variant.quantity:
-                messages.error(request,
-                               f"Не можна додати більше товару, ніж є на складі. Максимум {variant.quantity - current_quantity} одиниць доступно.")
+            if variant.quantity < total_quantity:
+                messages.error(self.request, f"Недостатньо товару на складі: {variant.quantity} одиниць доступно.")
                 return
 
-            # Якщо товару не вистачає, припиняємо додавання
             if key not in self.cart:
                 self.cart[key] = {'quantity': 0, 'price': str(variant.price), 'variant_id': variant_id}
 
-            if override_quantity:
-                self.cart[key]['quantity'] = quantity
-            else:
-                self.cart[key]['quantity'] += quantity
+            self.cart[key]['quantity'] = total_quantity if override_quantity else self.cart[key]['quantity'] + quantity
 
-        # Для товарів без варіантів
         else:
             # Перевіряємо залишки для звичайного товару
-            if product.quantity < quantity:
-                messages.error(request, f"Недостатньо товару на складі: {product.quantity} одиниць доступно.")
-                return  # Ви можете замінити повідомлення на переадресацію або інше
-
-            # Перевіряємо, скільки вже є в кошику
-            current_quantity = self.cart.get(key, {}).get('quantity', 0)
-            if current_quantity + quantity > product.quantity:
-                messages.error(request,
-                               f"Не можна додати більше товару, ніж є на складі. Максимум {product.quantity - current_quantity} одиниць доступно.")
+            if product.quantity < total_quantity:
+                messages.error(self.request, f"Недостатньо товару на складі: {product.quantity} одиниць доступно.")
                 return
 
             if key not in self.cart:
                 self.cart[key] = {'quantity': 0, 'price': str(product.price), 'variant_id': None}
 
-            if override_quantity:
-                self.cart[key]['quantity'] = quantity
-            else:
-                self.cart[key]['quantity'] += quantity
+            self.cart[key]['quantity'] = total_quantity if override_quantity else self.cart[key]['quantity'] + quantity
 
         self.save()
 
@@ -82,11 +65,17 @@ class Cart:
             product = Product.objects.get(id=product_id)
             item['product'] = product
 
-            if variant and item['variant_id']:
-                variant_obj = ProductVariant.objects.get(id=item['variant_id'])
-                item['variant'] = variant_obj
-                price = variant_obj.price
+            # Додаємо variant лише якщо він реально існує
+            if variant and item.get('variant_id'):
+                try:
+                    variant_obj = ProductVariant.objects.get(id=item['variant_id'])
+                    item['variant'] = variant_obj
+                    price = variant_obj.price
+                except ProductVariant.DoesNotExist:
+                    item['variant'] = None
+                    price = product.price
             else:
+                item['variant'] = None  # ← важливо!
                 price = product.price
 
             item['price'] = price

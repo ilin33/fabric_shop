@@ -16,10 +16,9 @@ def order_create(request):
         form = OrderCreateForm(request.POST)
         if form.is_valid():
             order = form.save(commit=False)
-
-            # Перевірка, які поля заповнювати в залежності від методу доставки
             method = form.cleaned_data['delivery_method']
 
+            # Обробка типу доставки
             if method == 'pickup':
                 order.city = ''
                 order.address = ''
@@ -28,33 +27,27 @@ def order_create(request):
                 order.nova_poshta_warehouse = ''
                 order.ukrposhta_city = ''
                 order.ukrposhta_warehouse = ''
-
             elif method == 'courier':
                 if not (order.city and order.address and order.postal_code):
                     messages.error(request, "Для кур'єрської доставки потрібно заповнити адресу, місто та поштовий код.")
                     return render(request, 'orders/order_create.html', {'form': form, 'cart': cart})
-
                 order.nova_poshta_city = ''
                 order.nova_poshta_warehouse = ''
                 order.ukrposhta_city = ''
                 order.ukrposhta_warehouse = ''
-
             elif method == 'nova_poshta':
                 if not (order.nova_poshta_city and order.nova_poshta_warehouse):
                     messages.error(request, "Оберіть місто та відділення Нової Пошти.")
                     return render(request, 'orders/order_create.html', {'form': form, 'cart': cart})
-
                 order.city = ''
                 order.address = ''
                 order.postal_code = ''
                 order.ukrposhta_city = ''
                 order.ukrposhta_warehouse = ''
-
             elif method == 'ukrposhta':
                 if not (order.ukrposhta_city and order.ukrposhta_warehouse):
                     messages.error(request, "Оберіть місто та відділення Укрпошти.")
                     return render(request, 'orders/order_create.html', {'form': form, 'cart': cart})
-
                 order.city = ''
                 order.address = ''
                 order.postal_code = ''
@@ -63,18 +56,35 @@ def order_create(request):
 
             order.save()
 
+            # Обробка товарів у кошику
             for item in cart:
+                variant = item.get('variant')
+                product = item.get('product')
+                quantity = item['quantity']
+
+                if variant:
+                    if variant.quantity < quantity:
+                        messages.error(request, f"Недостатньо товару: {variant} на складі {variant.quantity}")
+                        return render(request, 'orders/order_create.html', {'form': form, 'cart': cart})
+                    variant.quantity -= quantity
+                    variant.save()
+                elif product:
+                    if product.quantity < quantity:
+                        messages.error(request, f"Недостатньо товару: {product.name} на складі {product.quantity}")
+                        return render(request, 'orders/order_create.html', {'form': form, 'cart': cart})
+                    product.quantity -= quantity
+                    product.save()
+
                 OrderItem.objects.create(
                     order=order,
-                    product_variant=item['variant'],
+                    product_variant=variant,
                     price=item['price'],
-                    quantity=item['quantity']
+                    quantity=quantity
                 )
 
             cart.clear()
             messages.success(request, "Ваше замовлення успішно створено!")
-            return redirect('orders:order_success')  # додайте цю сторінку
-
+            return redirect('orders:order_success')
     else:
         form = OrderCreateForm()
 
