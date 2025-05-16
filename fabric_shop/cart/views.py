@@ -9,35 +9,41 @@ def add_to_cart(request, product_slug):
     product = get_object_or_404(Product, slug=product_slug)
     cart = Cart(request)
 
-    variant_id = request.POST.get('variant_id')
-    color = request.POST.get('color')
-    size = request.POST.get('size')
-
     quantity = int(request.POST.get('quantity', 1))
 
-    variant = None
-    if product.has_variants and (color or size):
-        variant = get_object_or_404(ProductVariant, product=product, color=color, size=size)
+    if product.has_variants:
+        color = request.POST.get('color', '').strip()
+        size = request.POST.get('size', '').strip()
 
-        # Перевірка залишків
+        # Динамічно будуємо фільтр
+        filter_kwargs = {'product': product}
+        if color:
+            filter_kwargs['color'] = color
+        if size:
+            filter_kwargs['size'] = size
+
+        try:
+            variant = ProductVariant.objects.get(**filter_kwargs)
+        except ProductVariant.DoesNotExist:
+            messages.error(request, "Вибраної комбінації немає.")
+            return redirect('shop:product_detail', slug=product_slug)
+
         if variant.quantity < quantity:
             messages.error(request, f"Недостатньо товару на складі: {variant.quantity} одиниць доступно.")
-            return redirect('shop:product_detail', slug=product_slug)  # Залишаємо на сторінці товару
+            return redirect('shop:product_detail', slug=product_slug)
 
-        # Додаємо товар з варіантом
         cart.add(product=product, variant_id=variant.id, quantity=quantity)
 
     else:
-        # Перевірка залишків для товарів без варіантів
         if product.quantity < quantity:
             messages.error(request, f"Недостатньо товару на складі: {product.quantity} одиниць доступно.")
-            return redirect('shop:product_detail', slug=product_slug)  # Залишаємо на сторінці товару
+            return redirect('shop:product_detail', slug=product_slug)
 
-        # Додаємо товар без варіантів
         cart.add(product=product, quantity=quantity)
 
     messages.success(request, 'Товар успішно додано до кошика!')
-    return redirect('cart:cart_detail')  # Якщо без помилок, редиректимо до кошика
+    return redirect('cart:cart_detail')
+
 
 
 

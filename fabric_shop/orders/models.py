@@ -1,18 +1,24 @@
 from django.db import models
 from django.conf import settings
 from shop.models import ProductVariant
+from django.core.validators import RegexValidator
 
 class Order(models.Model):
     DELIVERY_METHOD_CHOICES = [
         ('pickup', 'Самовивіз'),
-        ('courier', 'Кур’єрська доставка'),
         ('nova_poshta', 'Нова Пошта'),
         ('ukrposhta', 'Укрпошта'),
     ]
 
+    phone_regex = RegexValidator(
+        regex=r'^\+380\d{9}$',
+        message="Номер телефону має бути у форматі: '+380XXXXXXXXX' (9 цифр після +380)."
+    )
+
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
+    phone_number = models.CharField(validators=[phone_regex], max_length=13, help_text="У форматі +380XXXXXXXXX")
     email = models.EmailField()
 
     delivery_method = models.CharField(max_length=20, choices=DELIVERY_METHOD_CHOICES, default='pickup')
