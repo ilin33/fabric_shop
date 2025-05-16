@@ -8,11 +8,16 @@ class OrderItemInline(admin.TabularInline):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ['id', 'first_name', 'last_name', 'email', 'city', 'paid', 'created', 'updated']
-    list_filter = ['paid', 'created', 'updated']
+    list_display = ['id', 'first_name', 'last_name', 'email', 'display_city', 'paid', 'status', 'created', 'updated']
+    list_editable = ['paid', 'status']  # додаємо поля сюди, щоб їх можна було редагувати у списку
+    list_filter = ['paid', 'status', 'created', 'updated']
     inlines = [OrderItemInline]
     search_fields = ['first_name', 'last_name', 'email']
     readonly_fields = ['created', 'updated']
+
+    def display_city(self, obj):
+        return obj.city or obj.nova_poshta_city or obj.ukrposhta_city or "—"
+    display_city.short_description = "Місто"
 
 @admin.register(OrderItem)
 class OrderItemAdmin(admin.ModelAdmin):

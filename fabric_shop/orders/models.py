@@ -15,9 +15,24 @@ class Order(models.Model):
         message="Номер телефону має бути у форматі: '+380XXXXXXXXX' (9 цифр після +380)."
     )
 
+    STATUS_CHOICES = [
+        ('new', 'Нове'),
+        ('processing', 'Обробляється'),
+        ('shipped', 'Відправлено'),
+        ('completed', 'Завершено'),
+        ('cancelled', 'Скасовано'),
+    ]
+
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='new',
+        verbose_name="Статус"
+    )
+
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
-    first_name = models.CharField(max_length=50)
-    last_name = models.CharField(max_length=50)
+    first_name = models.CharField(max_length=50, verbose_name="Ім'я")
+    last_name = models.CharField(max_length=50, verbose_name="Прізвище")
     phone_number = models.CharField(validators=[phone_regex], max_length=13, help_text="У форматі +380XXXXXXXXX")
     email = models.EmailField()
 
@@ -36,9 +51,9 @@ class Order(models.Model):
     ukrposhta_city = models.CharField(max_length=100, blank=True)
     ukrposhta_warehouse = models.CharField(max_length=100, blank=True)
 
-    created = models.DateTimeField(auto_now_add=True)
-    updated = models.DateTimeField(auto_now=True)
-    paid = models.BooleanField(default=False)
+    created = models.DateTimeField(auto_now_add=True, verbose_name="Дата створення")
+    updated = models.DateTimeField(auto_now=True, verbose_name="Останнє оновлення")
+    paid = models.BooleanField(default=False, verbose_name="Оплата")
 
     class Meta:
         ordering = ['-created']
