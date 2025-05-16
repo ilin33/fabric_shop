@@ -1,6 +1,7 @@
 from django import forms
 from .models import Order
 
+
 class OrderCreateForm(forms.ModelForm):
     class Meta:
         model = Order
@@ -21,3 +22,14 @@ class OrderCreateForm(forms.ModelForm):
             'phone_number': 'Номер телефону',
             'delivery_method': 'Спосіб доставки',
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Зробити додаткові поля необов’язковими
+        optional_fields = [
+            'city', 'postal_code', 'address',
+            'nova_poshta_city', 'nova_poshta_warehouse',
+            'ukrposhta_city', 'ukrposhta_warehouse',
+        ]
+        for field in optional_fields:
+            self.fields[field].required = False

@@ -4,6 +4,18 @@
 <h2>Оформлення замовлення</h2>
 
 <form method="post" id="order-form">
+    {% if form.errors %}
+  <ul class="errorlist">
+    {% for field in form %}
+      {% for error in field.errors %}
+        <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+      {% endfor %}
+    {% endfor %}
+    {% for error in form.non_field_errors %}
+      <li><strong>Помилка:</strong> {{ error }}</li>
+    {% endfor %}
+  </ul>
+{% endif %}
     {% csrf_token %}
     <p>{{ form.first_name.label }}: {{ form.first_name }}</p>
     <p>{{ form.last_name.label }}: {{ form.last_name }}</p>
