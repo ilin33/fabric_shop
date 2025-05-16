@@ -11,19 +11,30 @@ class ProductAdminForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
         has_variants = False
+        has_color_variants = False
+        has_size_variants = False
 
         # Якщо ми редагуємо існуючий об'єкт
         if self.instance and self.instance.pk:
             has_variants = self.instance.has_variants
+            has_color_variants = self.instance.has_color_variants
+            has_size_variants = self.instance.has_size_variants
 
         # Якщо створення нового — пробуємо дістати з POST
         if 'has_variants' in self.data:
             has_variants = self.data.get('has_variants') in ['true', 'True', '1', 'on']
 
-        # Залежно від has_variants виставляємо required
-        make_optional = ['color', 'size', 'price', 'quantity']
-        for field in make_optional:
-            self.fields[field].required = not has_variants
+        # Якщо є варіанти, але не має кольору чи розміру — ставимо required = False для відповідних полів
+        # І навпаки — якщо є варіанти кольору/розміру, то required = True для них
+        if has_variants:
+            self.fields['color'].required = has_color_variants
+            self.fields['size'].required = has_size_variants
+            self.fields['price'].required = True
+            self.fields['quantity'].required = True
+        else:
+            # Якщо варіантів немає — всі ці поля не обов’язкові
+            for field in ['color', 'size', 'price', 'quantity']:
+                self.fields[field].required = False
 
     class Media:
         js = ('admin/js/product_admin.js',)

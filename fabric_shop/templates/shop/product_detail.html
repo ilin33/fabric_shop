@@ -47,7 +47,8 @@
             <select id="color" class="form-select" name="color">
               <option value="">Виберіть колір</option>
               {% for color in unique_colors %}
-                <option value="{{ color }}">{{ color }}</option>
+                <option value="{{ color }}" {% if color == selected_color %}selected{% endif %}>{{ color }}</option>
+
               {% endfor %}
             </select>
           </div>
@@ -61,7 +62,8 @@
             <select id="size" class="form-select" name="size">
               <option value="">Виберіть розмір</option>
               {% for size in unique_sizes %}
-                <option value="{{ size }}">{{ size }}</option>
+                <option value="{{ size }}" {% if size == selected_size %}selected{% endif %}>{{ size }}</option>
+
               {% endfor %}
             </select>
           </div>

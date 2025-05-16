@@ -85,6 +85,14 @@ class Product(models.Model):
             if errors:
                 raise ValidationError(errors)
 
+    @property
+    def has_color_variants(self):
+        return self.variants.filter(color__gt='').exists()
+
+    @property
+    def has_size_variants(self):
+        return self.variants.filter(size__gt='').exists()
+
 
 
 class ProductVariant(models.Model):
@@ -106,6 +114,8 @@ class ProductVariant(models.Model):
     @property
     def unit_of_measurement(self):
         return self.product.unit_of_measurement
+
+
 
 
 class UnitOfMeasurement(models.Model):

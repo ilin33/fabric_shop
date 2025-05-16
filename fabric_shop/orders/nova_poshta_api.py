@@ -12,7 +12,8 @@ def get_np_cities():
         return [
             {'Description': 'Київ', 'Ref': '1'},
             {'Description': 'Львів', 'Ref': '2'},
-            {'Description': 'Харків', 'Ref': '3'}
+            {'Description': 'Харків', 'Ref': '3'},
+            {'Description': 'Дніпро', 'Ref': '4'},
         ]
 
     url = BASE_URL
@@ -35,8 +36,8 @@ def get_np_warehouses(city_ref):
     if not NP_TOKEN:
         # Тестові відділення
         return [
-            {'name': 'Відділення 1', 'ref': '101'},
-            {'name': 'Відділення 2', 'ref': '102'},
+            {'Description': 'Відділення 1', 'Ref': '101'},
+            {'Description': 'Відділення 2', 'Ref': '102'},
         ]
 
     url = BASE_URL
@@ -49,7 +50,14 @@ def get_np_warehouses(city_ref):
     try:
         response = requests.post(url, json=data)
         if response.status_code == 200:
-            return response.json().get("data", [])
+            warehouses = response.json().get("data", [])
+            # Повертаємо тільки ті відділення, у яких є Description
+            return [
+                {'Description': wh['Description'], 'Ref': wh['Ref']}
+                for wh in warehouses
+                if wh.get('Description') and wh.get('Description').strip()
+            ]
     except requests.RequestException:
         pass
     return []
+

@@ -12,7 +12,8 @@ def get_up_cities():
         return [
             {'city': 'Київ', 'id': '1'},
             {'city': 'Львів', 'id': '2'},
-            {'city': 'Харків', 'id': '3'}
+            {'city': 'Харків', 'id': '3'},
+            {'city': 'Дніпро', 'id': '4'},
         ]
 
     url = f'{BASE_URL}/rest/address/search-city?token={UP_TOKEN}'

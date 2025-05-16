@@ -3,34 +3,51 @@ from shop.models import Product, ProductVariant
 from .cart import Cart
 from django.http import JsonResponse
 from django.contrib import messages
+from django.urls import reverse
+from django.utils.http import urlencode
 
 
 def add_to_cart(request, product_slug):
     product = get_object_or_404(Product, slug=product_slug)
     cart = Cart(request)
-
     quantity = int(request.POST.get('quantity', 1))
+
+    # Параметри для повернення назад у разі помилки
+    redirect_params = {}
 
     if product.has_variants:
         color = request.POST.get('color', '').strip()
         size = request.POST.get('size', '').strip()
 
-        # Динамічно будуємо фільтр
-        filter_kwargs = {'product': product}
-        if color:
-            filter_kwargs['color'] = color
-        if size:
-            filter_kwargs['size'] = size
+        if product.has_color_variants and not color:
+            messages.error(request, "Будь ласка, виберіть колір.")
+            redirect_params['color'] = ''
+        else:
+            redirect_params['color'] = color
 
+        if product.has_size_variants and not size:
+            messages.error(request, "Будь ласка, виберіть розмір.")
+            redirect_params['size'] = ''
+        else:
+            redirect_params['size'] = size
+
+        # Якщо відсутній обов'язковий параметр — повертаємо користувача назад
+        if (product.has_color_variants and not color) or (product.has_size_variants and not size):
+            url = reverse('shop:product_detail', kwargs={'slug': product_slug})
+            return redirect(f'{url}?{urlencode(redirect_params)}')
+
+        # Спробуємо знайти варіант
         try:
-            variant = ProductVariant.objects.get(**filter_kwargs)
+            variant = ProductVariant.objects.get(product=product, color=color, size=size)
         except ProductVariant.DoesNotExist:
-            messages.error(request, "Вибраної комбінації немає.")
-            return redirect('shop:product_detail', slug=product_slug)
+            messages.error(request, "Такої комбінації кольору та розміру немає.")
+            url = reverse('shop:product_detail', kwargs={'slug': product_slug})
+            return redirect(f'{url}?{urlencode(redirect_params)}')
 
         if variant.quantity < quantity:
             messages.error(request, f"Недостатньо товару на складі: {variant.quantity} одиниць доступно.")
-            return redirect('shop:product_detail', slug=product_slug)
+            url = reverse('shop:product_detail', kwargs={'slug': product_slug})
+            return redirect(f'{url}?{urlencode(redirect_params)}')
 
         cart.add(product=product, variant_id=variant.id, quantity=quantity)
 
@@ -43,8 +60,6 @@ def add_to_cart(request, product_slug):
 
     messages.success(request, 'Товар успішно додано до кошика!')
     return redirect('cart:cart_detail')
-
-
 
 
 def cart_detail(request):

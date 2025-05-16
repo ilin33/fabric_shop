@@ -49,6 +49,9 @@ def product_detail(request, slug):
     unique_colors = sorted(set(v.color for v in variants if v.color))
     unique_sizes = sorted(set(v.size for v in variants if v.size))
 
+    selected_color = request.GET.get("color", "")
+    selected_size = request.GET.get("size", "")
+
     # Обробка коментарів
     comments = ProductComment.objects.filter(product=product)
     paginator = Paginator(comments, 5)
@@ -73,11 +76,14 @@ def product_detail(request, slug):
         'show_size': show_size,
         'unique_colors': unique_colors,
         'unique_sizes': unique_sizes,
+        'selected_color': selected_color,
+        'selected_size': selected_size,
         'form': form,
         'page_obj': page_obj,
     }
 
     return render(request, 'shop/product_detail.html', context)
+
 
 
 
