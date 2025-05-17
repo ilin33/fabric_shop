@@ -81,3 +81,5 @@ class ProductCommentAdmin(admin.ModelAdmin):
     list_display = ('product', 'user', 'created_at')
     list_filter = ('created_at',)
     search_fields = ('text', 'user__username', 'product__name')
+
+

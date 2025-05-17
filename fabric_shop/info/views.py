@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
-from .models import SiteInfo, Testimonial
+from .models import SiteInfo, Testimonial, DeliveryAndPayment
 from .forms import TestimonialForm
+from django.shortcuts import render, get_object_or_404
 
 from django.contrib.auth.views import LoginView
 
@@ -52,3 +53,7 @@ def about_view(request):
         'page_obj': page_obj,  # Передаємо об'єкт сторінки в шаблон
         'form': form,
     })
+
+def delivery_payment_view(request):
+    page = get_object_or_404(DeliveryAndPayment)
+    return render(request, 'info/delivery_payment.html', {'page': page})

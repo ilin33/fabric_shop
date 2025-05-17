@@ -29,6 +29,7 @@ urlpatterns = [
     path('accounts/', include('allauth.urls')), # автентифікація
     path('cart/', include('cart.urls', namespace='cart')),
     path('orders/', include('orders.urls', namespace='orders')),
+    path('services/', include('services.urls', namespace='services')),
 
 ]
 

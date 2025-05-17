@@ -8,16 +8,32 @@
             <div class="col-md-4">
                 <ul class="list-unstyled text-center footer-links">
                     <li><a href="{% url 'info:about' %}" class="text-white">Про нас</a></li>
-                    <li><a href="#" class="text-white">Доставка та оплата</a></li>
+                    <li><a href="{% url 'info:delivery_payment' %}" class="text-white">Доставка та оплата</a></li>
                     <li><a href="{% url 'info:about' %}#contacts" class="text-white">Контакти</a></li>
                 </ul>
             </div>
             <div class="col-md-4">
                 <p class="m-0 text-center text-white">Соціальні мережі:</p>
                 <div class="d-flex justify-content-center social-icons">
-                    <a href="#" class="text-white me-3"><i class="bi bi-facebook"></i></a>
-                    <a href="#" class="text-white me-3"><i class="bi bi-instagram"></i></a>
-                    <a href="#" class="text-white me-3"><i class="bi bi-twitter"></i></a>
+                    {% for link in social_links %}
+                        {% if link.url %}
+                            {% if link.platform == 'facebook' %}
+                                <a href="{{ link.url }}" class="text-white me-3" target="_blank" rel="noopener noreferrer">
+                                    <i class="bi bi-facebook"></i>
+                                </a>
+                            {% elif link.platform == 'instagram' %}
+                                <a href="{{ link.url }}" class="text-white me-3" target="_blank" rel="noopener noreferrer">
+                                    <i class="bi bi-instagram"></i>
+                                </a>
+                            {% elif link.platform == 'twitter' %}
+                                <a href="{{ link.url }}" class="text-white me-3" target="_blank" rel="noopener noreferrer">
+                                    <i class="bi bi-twitter"></i>
+                                </a>
+                            {% endif %}
+                        {% endif %}
+                    {% empty %}
+                        <!-- Якщо соцмереж немає, можна показати заглушку або нічого -->
+                    {% endfor %}
                 </div>
             </div>
         </div>

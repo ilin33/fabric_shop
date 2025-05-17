@@ -145,3 +145,6 @@ class ProductComment(models.Model):
         return f"{self.user} — {self.product.name}"
 
 
+
+
+

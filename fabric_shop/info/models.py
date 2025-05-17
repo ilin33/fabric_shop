@@ -28,3 +28,32 @@ class Testimonial(models.Model):
     class Meta:
         verbose_name = "Відгук"
         verbose_name_plural = "Відгуки"
+
+class SocialLink(models.Model):
+    PLATFORM_CHOICES = [
+        ('facebook', 'Facebook'),
+        ('instagram', 'Instagram'),
+        ('twitter', 'Twitter'),
+    ]
+
+    platform = models.CharField(max_length=20, choices=PLATFORM_CHOICES, unique=True)
+    url = models.URLField(verbose_name="Посилання")
+
+    class Meta:
+        verbose_name = "Соцмережа"
+        verbose_name_plural = "Соцмережі"
+
+    def __str__(self):
+        return dict(self.PLATFORM_CHOICES).get(self.platform, self.platform)
+
+
+class DeliveryAndPayment(models.Model):
+    title = models.CharField("Заголовок сторінки", max_length=200, default="Доставка та оплата")
+    content = models.TextField("Контент сторінки (HTML або текст)", help_text="Можна використовувати HTML")
+
+    class Meta:
+        verbose_name = "Сторінка доставки та оплати"
+        verbose_name_plural = "Сторінка доставки та оплати"
+
+    def __str__(self):
+        return self.title

@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'shop',
     'info',
     'orders',
+    'services',
 
 ]
 
@@ -91,6 +92,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'shop.context_processors.categories_with_subcategories',
                 'cart.context_processors.cart_quantity',
+                'info.context_processors.social_links',
             ],
         },
     },

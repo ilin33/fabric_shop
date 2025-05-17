@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-center mb-4">Наші послуги</h2>
+    <div class="row justify-content-center">
+        {% for service in services %}
+            <div class="col-md-4 mb-4 d-flex align-items-stretch">
+                <div class="card h-100 shadow rounded">
+                    <img src="{{ service.image.url }}" class="card-img-top" alt="{{ service.name }}">
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title text-center">{{ service.name }}</h5>
+                        <p class="card-text flex-grow-1">{{ service.description|linebreaks }}</p>
+                        <p class="card-text fw-bold text-center">Ціна: {{ service.price }} грн</p>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
